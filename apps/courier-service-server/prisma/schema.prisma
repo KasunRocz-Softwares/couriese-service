@@ -1,0 +1,74 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model CourierAgent {
+  createdAt  DateTime   @default(now())
+  deliveries Delivery[]
+  email      String?
+  id         String     @id @default(cuid())
+  name       String?
+  phone      String?
+  updatedAt  DateTime   @updatedAt
+}
+
+model Notification {
+  createdAt DateTime                @default(now())
+  id        String                  @id @default(cuid())
+  message   String?
+  recipient String?
+  status    EnumNotificationStatus?
+  updatedAt DateTime                @updatedAt
+}
+
+model Order {
+  createdAt        DateTime         @default(now())
+  customer         Customer?        @relation(fields: [customerId], references: [id])
+  customerId       String?
+  deliveries       Delivery[]
+  deliveryLocation String?
+  id               String           @id @default(cuid())
+  packageDetails   String?
+  pickupLocation   String?
+  status           EnumOrderStatus?
+  updatedAt        DateTime         @updatedAt
+}
+
+model Customer {
+  address   String?
+  createdAt DateTime @default(now())
+  email     String?
+  id        String   @id @default(cuid())
+  name      String?
+  orders    Order[]
+  phone     String?
+  updatedAt DateTime @updatedAt
+}
+
+model Delivery {
+  courierAgent   CourierAgent?       @relation(fields: [courierAgentId], references: [id])
+  courierAgentId String?
+  createdAt      DateTime            @default(now())
+  id             String              @id @default(cuid())
+  order          Order?              @relation(fields: [orderId], references: [id])
+  orderId        String?
+  status         EnumDeliveryStatus?
+  updatedAt      DateTime            @updatedAt
+}
+
+enum EnumNotificationStatus {
+  Option1
+}
+
+enum EnumOrderStatus {
+  Option1
+}
+
+enum EnumDeliveryStatus {
+  Option1
+}
